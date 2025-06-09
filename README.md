@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: <!-- Remove Lovable URL -->
+
 
 ## How can I edit this code?
 
