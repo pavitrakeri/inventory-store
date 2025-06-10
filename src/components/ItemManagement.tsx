@@ -1,5 +1,5 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Plus, Package } from "lucide-react";
+
+const API_BASE = "http://localhost:4000/api";
 
 interface Item {
   id: string;
@@ -28,6 +30,10 @@ const ItemManagement = () => {
     barcode: ""
   });
 
+  useEffect(() => {
+    axios.get(`${API_BASE}/items`).then(res => setItems(res.data));
+  }, []);
+
   const categories = ["Electronics", "Clothing", "Food", "Books", "Home & Garden", "Sports", "Other"];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -47,14 +53,28 @@ const ItemManagement = () => {
       barcode: formData.barcode
     };
 
-    setItems([...items, newItem]);
-    setFormData({ name: "", description: "", category: "", price: "", barcode: "" });
-    toast.success("Item added successfully!");
+    axios.post(`${API_BASE}/items`, newItem)
+      .then(res => {
+        setItems([...items, res.data]);
+        setFormData({ name: "", description: "", category: "", price: "", barcode: "" });
+        toast.success("Item added successfully!");
+      })
+      .catch(err => {
+        console.error(err);
+        toast.error("Failed to add item");
+      });
   };
 
   const handleDelete = (id: string) => {
-    setItems(items.filter(item => item.id !== id));
-    toast.success("Item deleted successfully!");
+    axios.delete(`${API_BASE}/items/${id}`)
+      .then(res => {
+        setItems(items.filter(item => item.id !== id));
+        toast.success("Item deleted successfully!");
+      })
+      .catch(err => {
+        console.error(err);
+        toast.error("Failed to delete item");
+      });
   };
 
   return (
@@ -163,7 +183,7 @@ const ItemManagement = () => {
                     <tr key={item.id} className="hover:bg-muted/50">
                       <td className="border border-border p-3">{item.name}</td>
                       <td className="border border-border p-3">{item.category}</td>
-                      <td className="border border-border p-3">${item.price.toFixed(2)}</td>
+                      <td className="border border-border p-3">${Number(item.price).toFixed(2)}</td>
                       <td className="border border-border p-3">{item.barcode || "N/A"}</td>
                       <td className="border border-border p-3">
                         <Button

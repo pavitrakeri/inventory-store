@@ -1,54 +1,24 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Database, Package, Warehouse, ShoppingCart, Eye } from "lucide-react";
 
-// Mock data for demonstration
-const mockItems = [
-  { id: 1, name: "Laptop", category: "Electronics", price: 999.99, barcode: "123456789" },
-  { id: 2, name: "Mouse", category: "Electronics", price: 29.99, barcode: "987654321" },
-  { id: 3, name: "Keyboard", category: "Electronics", price: 79.99, barcode: "456789123" }
-];
-
-const mockInventory = [
-  { id: 1, itemName: "Laptop", quantity: 15, minStock: 5, location: "Warehouse A", status: "In Stock" },
-  { id: 2, itemName: "Mouse", quantity: 3, minStock: 10, location: "Store Front", status: "Low Stock" },
-  { id: 3, itemName: "Keyboard", quantity: 25, minStock: 8, location: "Warehouse B", status: "In Stock" }
-];
-
-const mockPurchases = [
-  {
-    id: 1,
-    customerName: "John Doe",
-    customerEmail: "john@example.com",
-    items: [
-      { itemName: "Laptop", quantity: 1, price: 999.99, total: 999.99 }
-    ],
-    totalAmount: 999.99,
-    paymentMethod: "Credit Card",
-    date: "2024-01-15",
-    status: "Completed"
-  },
-  {
-    id: 2,
-    customerName: "Jane Smith",
-    customerEmail: "jane@example.com",
-    items: [
-      { itemName: "Mouse", quantity: 2, price: 29.99, total: 59.98 },
-      { itemName: "Keyboard", quantity: 1, price: 79.99, total: 79.99 }
-    ],
-    totalAmount: 139.97,
-    paymentMethod: "Cash",
-    date: "2024-01-16",
-    status: "Completed"
-  }
-];
+const API_BASE = "http://localhost:4000/api";
 
 const DataDisplay = () => {
+  const [items, setItems] = useState<any[]>([]);
+  const [inventory, setInventory] = useState<any[]>([]);
+  const [purchases, setPurchases] = useState<any[]>([]);
   const [selectedPurchase, setSelectedPurchase] = useState<any>(null);
+
+  useEffect(() => {
+    axios.get(`${API_BASE}/items`).then(res => setItems(res.data));
+    axios.get(`${API_BASE}/inventory`).then(res => setInventory(res.data));
+    axios.get(`${API_BASE}/purchases`).then(res => setPurchases(res.data));
+  }, []);
 
   const getStatusBadge = (status: string) => {
     const variant = status === "Low Stock" ? "destructive" : "default";
@@ -73,7 +43,7 @@ const DataDisplay = () => {
                 <Package className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{mockItems.length}</div>
+                <div className="text-2xl font-bold">{items.length}</div>
                 <p className="text-xs text-muted-foreground">Items in catalog</p>
               </CardContent>
             </Card>
@@ -84,9 +54,9 @@ const DataDisplay = () => {
                 <Warehouse className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{mockInventory.length}</div>
+                <div className="text-2xl font-bold">{inventory.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  {mockInventory.filter(item => item.status === "Low Stock").length} low stock
+                  {inventory.filter(item => item.status === "Low Stock").length} low stock
                 </p>
               </CardContent>
             </Card>
@@ -98,9 +68,9 @@ const DataDisplay = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  ${mockPurchases.reduce((sum, p) => sum + p.totalAmount, 0).toFixed(2)}
+                  ${purchases.reduce((sum, p) => sum + p.totalAmount, 0).toFixed(2)}
                 </div>
-                <p className="text-xs text-muted-foreground">{mockPurchases.length} transactions</p>
+                <p className="text-xs text-muted-foreground">{purchases.length} transactions</p>
               </CardContent>
             </Card>
           </div>
@@ -128,7 +98,7 @@ const DataDisplay = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {mockItems.map((item) => (
+                    {items.map((item) => (
                       <tr key={item.id} className="hover:bg-muted/50">
                         <td className="border border-border p-3">{item.id}</td>
                         <td className="border border-border p-3">{item.name}</td>
@@ -173,7 +143,7 @@ const DataDisplay = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {mockInventory.map((item) => (
+                    {inventory.map((item) => (
                       <tr key={item.id} className="hover:bg-muted/50">
                         <td className="border border-border p-3">{item.id}</td>
                         <td className="border border-border p-3">{item.itemName}</td>
@@ -223,7 +193,7 @@ const DataDisplay = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {mockPurchases.map((purchase) => (
+                      {purchases.map((purchase) => (
                         <tr key={purchase.id} className="hover:bg-muted/50">
                           <td className="border border-border p-3">{purchase.id}</td>
                           <td className="border border-border p-3">{purchase.customerName}</td>
