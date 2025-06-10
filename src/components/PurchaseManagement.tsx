@@ -1,5 +1,5 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,8 @@ interface Purchase {
   status: string;
 }
 
+const API_BASE = "http://localhost:4000/api";
+
 const PurchaseManagement = () => {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [currentPurchase, setCurrentPurchase] = useState<PurchaseItem[]>([]);
@@ -44,6 +46,10 @@ const PurchaseManagement = () => {
 
   const paymentMethods = ["Cash", "Credit Card", "Debit Card", "Digital Wallet", "Bank Transfer"];
   const availableItems = ["Laptop", "Mouse", "Keyboard", "Monitor", "Headphones", "Smartphone", "Tablet"];
+
+  useEffect(() => {
+    axios.get(`${API_BASE}/purchases`).then(res => setPurchases(res.data));
+  }, []);
 
   const addItemToPurchase = () => {
     if (!newItem.itemName || !newItem.quantity || !newItem.price) {

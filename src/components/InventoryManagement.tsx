@@ -1,5 +1,5 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Warehouse, Plus, AlertTriangle } from "lucide-react";
+
+const API_BASE = "http://localhost:4000/api";
 
 interface InventoryItem {
   id: string;
@@ -27,6 +29,10 @@ const InventoryManagement = () => {
   });
 
   const locations = ["Warehouse A", "Warehouse B", "Store Front", "Back Office", "Display Area"];
+
+  useEffect(() => {
+    axios.get(`${API_BASE}/inventory`).then(res => setInventory(res.data));
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
